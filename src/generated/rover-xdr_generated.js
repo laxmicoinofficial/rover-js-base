@@ -18,39 +18,39 @@ xdr.typedef("Value", xdr.varOpaque());
 
 // === xdr source ============================================================
 //
-//   struct SCPBallot
+//   struct RCABallot
 //   {
 //       uint32 counter; // n
 //       Value value;    // x
 //   };
 //
 // ===========================================================================
-xdr.struct("ScpBallot", [
+xdr.struct("RcaBallot", [
   ["counter", xdr.lookup("Uint32")],
   ["value", xdr.lookup("Value")],
 ]);
 
 // === xdr source ============================================================
 //
-//   enum SCPStatementType
+//   enum RCAStatementType
 //   {
-//       SCP_ST_PREPARE = 0,
-//       SCP_ST_CONFIRM = 1,
-//       SCP_ST_EXTERNALIZE = 2,
-//       SCP_ST_NOMINATE = 3
+//       RCA_ST_PREPARE = 0,
+//       RCA_ST_CONFIRM = 1,
+//       RCA_ST_EXTERNALIZE = 2,
+//       RCA_ST_NOMINATE = 3
 //   };
 //
 // ===========================================================================
-xdr.enum("ScpStatementType", {
-  scpStPrepare: 0,
-  scpStConfirm: 1,
-  scpStExternalize: 2,
-  scpStNominate: 3,
+xdr.enum("RcaStatementType", {
+  rcaStPrepare: 0,
+  rcaStConfirm: 1,
+  rcaStExternalize: 2,
+  rcaStNominate: 3,
 });
 
 // === xdr source ============================================================
 //
-//   struct SCPNomination
+//   struct RCANomination
 //   {
 //       Hash quorumSetHash; // D
 //       Value votes<>;      // X
@@ -58,7 +58,7 @@ xdr.enum("ScpStatementType", {
 //   };
 //
 // ===========================================================================
-xdr.struct("ScpNomination", [
+xdr.struct("RcaNomination", [
   ["quorumSetHash", xdr.lookup("Hash")],
   ["votes", xdr.varArray(xdr.lookup("Value"), 2147483647)],
   ["accepted", xdr.varArray(xdr.lookup("Value"), 2147483647)],
@@ -69,19 +69,19 @@ xdr.struct("ScpNomination", [
 //   struct
 //           {
 //               Hash quorumSetHash;       // D
-//               SCPBallot ballot;         // b
-//               SCPBallot* prepared;      // p
-//               SCPBallot* preparedPrime; // p'
+//               RCABallot ballot;         // b
+//               RCABallot* prepared;      // p
+//               RCABallot* preparedPrime; // p'
 //               uint32 nC;                // c.n
 //               uint32 nH;                // h.n
 //           }
 //
 // ===========================================================================
-xdr.struct("ScpStatementPrepare", [
+xdr.struct("RcaStatementPrepare", [
   ["quorumSetHash", xdr.lookup("Hash")],
-  ["ballot", xdr.lookup("ScpBallot")],
-  ["prepared", xdr.option(xdr.lookup("ScpBallot"))],
-  ["preparedPrime", xdr.option(xdr.lookup("ScpBallot"))],
+  ["ballot", xdr.lookup("RcaBallot")],
+  ["prepared", xdr.option(xdr.lookup("RcaBallot"))],
+  ["preparedPrime", xdr.option(xdr.lookup("RcaBallot"))],
   ["nC", xdr.lookup("Uint32")],
   ["nH", xdr.lookup("Uint32")],
 ]);
@@ -90,7 +90,7 @@ xdr.struct("ScpStatementPrepare", [
 //
 //   struct
 //           {
-//               SCPBallot ballot;   // b
+//               RCABallot ballot;   // b
 //               uint32 nPrepared;   // p.n
 //               uint32 nCommit;     // c.n
 //               uint32 nH;          // h.n
@@ -98,8 +98,8 @@ xdr.struct("ScpStatementPrepare", [
 //           }
 //
 // ===========================================================================
-xdr.struct("ScpStatementConfirm", [
-  ["ballot", xdr.lookup("ScpBallot")],
+xdr.struct("RcaStatementConfirm", [
+  ["ballot", xdr.lookup("RcaBallot")],
   ["nPrepared", xdr.lookup("Uint32")],
   ["nCommit", xdr.lookup("Uint32")],
   ["nH", xdr.lookup("Uint32")],
@@ -110,146 +110,146 @@ xdr.struct("ScpStatementConfirm", [
 //
 //   struct
 //           {
-//               SCPBallot commit;         // c
+//               RCABallot commit;         // c
 //               uint32 nH;                // h.n
 //               Hash commitQuorumSetHash; // D used before EXTERNALIZE
 //           }
 //
 // ===========================================================================
-xdr.struct("ScpStatementExternalize", [
-  ["commit", xdr.lookup("ScpBallot")],
+xdr.struct("RcaStatementExternalize", [
+  ["commit", xdr.lookup("RcaBallot")],
   ["nH", xdr.lookup("Uint32")],
   ["commitQuorumSetHash", xdr.lookup("Hash")],
 ]);
 
 // === xdr source ============================================================
 //
-//   union switch (SCPStatementType type)
+//   union switch (RCAStatementType type)
 //       {
-//       case SCP_ST_PREPARE:
+//       case RCA_ST_PREPARE:
 //           struct
 //           {
 //               Hash quorumSetHash;       // D
-//               SCPBallot ballot;         // b
-//               SCPBallot* prepared;      // p
-//               SCPBallot* preparedPrime; // p'
+//               RCABallot ballot;         // b
+//               RCABallot* prepared;      // p
+//               RCABallot* preparedPrime; // p'
 //               uint32 nC;                // c.n
 //               uint32 nH;                // h.n
 //           } prepare;
-//       case SCP_ST_CONFIRM:
+//       case RCA_ST_CONFIRM:
 //           struct
 //           {
-//               SCPBallot ballot;   // b
+//               RCABallot ballot;   // b
 //               uint32 nPrepared;   // p.n
 //               uint32 nCommit;     // c.n
 //               uint32 nH;          // h.n
 //               Hash quorumSetHash; // D
 //           } confirm;
-//       case SCP_ST_EXTERNALIZE:
+//       case RCA_ST_EXTERNALIZE:
 //           struct
 //           {
-//               SCPBallot commit;         // c
+//               RCABallot commit;         // c
 //               uint32 nH;                // h.n
 //               Hash commitQuorumSetHash; // D used before EXTERNALIZE
 //           } externalize;
-//       case SCP_ST_NOMINATE:
-//           SCPNomination nominate;
+//       case RCA_ST_NOMINATE:
+//           RCANomination nominate;
 //       }
 //
 // ===========================================================================
-xdr.union("ScpStatementPledges", {
-  switchOn: xdr.lookup("ScpStatementType"),
+xdr.union("RcaStatementPledges", {
+  switchOn: xdr.lookup("RcaStatementType"),
   switchName: "type",
   switches: [
-    ["scpStPrepare", "prepare"],
-    ["scpStConfirm", "confirm"],
-    ["scpStExternalize", "externalize"],
-    ["scpStNominate", "nominate"],
+    ["rcaStPrepare", "prepare"],
+    ["rcaStConfirm", "confirm"],
+    ["rcaStExternalize", "externalize"],
+    ["rcaStNominate", "nominate"],
   ],
   arms: {
-    prepare: xdr.lookup("ScpStatementPrepare"),
-    confirm: xdr.lookup("ScpStatementConfirm"),
-    externalize: xdr.lookup("ScpStatementExternalize"),
-    nominate: xdr.lookup("ScpNomination"),
+    prepare: xdr.lookup("RcaStatementPrepare"),
+    confirm: xdr.lookup("RcaStatementConfirm"),
+    externalize: xdr.lookup("RcaStatementExternalize"),
+    nominate: xdr.lookup("RcaNomination"),
   },
 });
 
 // === xdr source ============================================================
 //
-//   struct SCPStatement
+//   struct RCAStatement
 //   {
 //       NodeID nodeID;    // v
 //       uint64 slotIndex; // i
 //   
-//       union switch (SCPStatementType type)
+//       union switch (RCAStatementType type)
 //       {
-//       case SCP_ST_PREPARE:
+//       case RCA_ST_PREPARE:
 //           struct
 //           {
 //               Hash quorumSetHash;       // D
-//               SCPBallot ballot;         // b
-//               SCPBallot* prepared;      // p
-//               SCPBallot* preparedPrime; // p'
+//               RCABallot ballot;         // b
+//               RCABallot* prepared;      // p
+//               RCABallot* preparedPrime; // p'
 //               uint32 nC;                // c.n
 //               uint32 nH;                // h.n
 //           } prepare;
-//       case SCP_ST_CONFIRM:
+//       case RCA_ST_CONFIRM:
 //           struct
 //           {
-//               SCPBallot ballot;   // b
+//               RCABallot ballot;   // b
 //               uint32 nPrepared;   // p.n
 //               uint32 nCommit;     // c.n
 //               uint32 nH;          // h.n
 //               Hash quorumSetHash; // D
 //           } confirm;
-//       case SCP_ST_EXTERNALIZE:
+//       case RCA_ST_EXTERNALIZE:
 //           struct
 //           {
-//               SCPBallot commit;         // c
+//               RCABallot commit;         // c
 //               uint32 nH;                // h.n
 //               Hash commitQuorumSetHash; // D used before EXTERNALIZE
 //           } externalize;
-//       case SCP_ST_NOMINATE:
-//           SCPNomination nominate;
+//       case RCA_ST_NOMINATE:
+//           RCANomination nominate;
 //       }
 //       pledges;
 //   };
 //
 // ===========================================================================
-xdr.struct("ScpStatement", [
+xdr.struct("RcaStatement", [
   ["nodeId", xdr.lookup("NodeId")],
   ["slotIndex", xdr.lookup("Uint64")],
-  ["pledges", xdr.lookup("ScpStatementPledges")],
+  ["pledges", xdr.lookup("RcaStatementPledges")],
 ]);
 
 // === xdr source ============================================================
 //
-//   struct SCPEnvelope
+//   struct RCAEnvelope
 //   {
-//       SCPStatement statement;
+//       RCAStatement statement;
 //       Signature signature;
 //   };
 //
 // ===========================================================================
-xdr.struct("ScpEnvelope", [
-  ["statement", xdr.lookup("ScpStatement")],
+xdr.struct("RcaEnvelope", [
+  ["statement", xdr.lookup("RcaStatement")],
   ["signature", xdr.lookup("Signature")],
 ]);
 
 // === xdr source ============================================================
 //
-//   struct SCPQuorumSet
+//   struct RCAQuorumSet
 //   {
 //       uint32 threshold;
 //       PublicKey validators<>;
-//       SCPQuorumSet innerSets<>;
+//       RCAQuorumSet innerSets<>;
 //   };
 //
 // ===========================================================================
-xdr.struct("ScpQuorumSet", [
+xdr.struct("RcaQuorumSet", [
   ["threshold", xdr.lookup("Uint32")],
   ["validators", xdr.varArray(xdr.lookup("PublicKey"), 2147483647)],
-  ["innerSets", xdr.varArray(xdr.lookup("ScpQuorumSet"), 2147483647)],
+  ["innerSets", xdr.varArray(xdr.lookup("RcaQuorumSet"), 2147483647)],
 ]);
 
 // === xdr source ============================================================
@@ -794,14 +794,14 @@ xdr.struct("LedgerEntry", [
 //
 //   enum EnvelopeType
 //   {
-//       ENVELOPE_TYPE_SCP = 1,
+//       ENVELOPE_TYPE_RCA = 1,
 //       ENVELOPE_TYPE_TX = 2,
 //       ENVELOPE_TYPE_AUTH = 3
 //   };
 //
 // ===========================================================================
 xdr.enum("EnvelopeType", {
-  envelopeTypeScp: 1,
+  envelopeTypeRca: 1,
   envelopeTypeTx: 2,
   envelopeTypeAuth: 3,
 });
@@ -822,7 +822,7 @@ xdr.typedef("UpgradeType", xdr.varOpaque(128));
 //       }
 //
 // ===========================================================================
-xdr.union("StellarValueExt", {
+xdr.union("RoverValueExt", {
   switchOn: xdr.int(),
   switchName: "v",
   switches: [
@@ -834,7 +834,7 @@ xdr.union("StellarValueExt", {
 
 // === xdr source ============================================================
 //
-//   struct StellarValue
+//   struct RoverValue
 //   {
 //       Hash txSetHash;   // transaction set to apply to previous ledger
 //       uint64 closeTime; // network close time
@@ -856,11 +856,11 @@ xdr.union("StellarValueExt", {
 //   };
 //
 // ===========================================================================
-xdr.struct("StellarValue", [
+xdr.struct("RoverValue", [
   ["txSetHash", xdr.lookup("Hash")],
   ["closeTime", xdr.lookup("Uint64")],
   ["upgrades", xdr.varArray(xdr.lookup("UpgradeType"), 6)],
-  ["ext", xdr.lookup("StellarValueExt")],
+  ["ext", xdr.lookup("RoverValueExt")],
 ]);
 
 // === xdr source ============================================================
@@ -888,7 +888,7 @@ xdr.union("LedgerHeaderExt", {
 //   {
 //       uint32 ledgerVersion;    // the protocol version of the ledger
 //       Hash previousLedgerHash; // hash of the previous ledger header
-//       StellarValue scpValue;   // what consensus agreed to
+//       RoverValue rcaValue;   // what consensus agreed to
 //       Hash txSetResultHash;    // the TransactionResultSet that led to this ledger
 //       Hash bucketListHash;     // hash of the ledger state
 //   
@@ -926,7 +926,7 @@ xdr.union("LedgerHeaderExt", {
 xdr.struct("LedgerHeader", [
   ["ledgerVersion", xdr.lookup("Uint32")],
   ["previousLedgerHash", xdr.lookup("Hash")],
-  ["scpValue", xdr.lookup("StellarValue")],
+  ["rcaValue", xdr.lookup("RoverValue")],
   ["txSetResultHash", xdr.lookup("Hash")],
   ["bucketListHash", xdr.lookup("Hash")],
   ["ledgerSeq", xdr.lookup("Uint32")],
@@ -1296,49 +1296,49 @@ xdr.struct("LedgerHeaderHistoryEntry", [
 
 // === xdr source ============================================================
 //
-//   struct LedgerSCPMessages
+//   struct LedgerRCAMessages
 //   {
 //       uint32 ledgerSeq;
-//       SCPEnvelope messages<>;
+//       RCAEnvelope messages<>;
 //   };
 //
 // ===========================================================================
-xdr.struct("LedgerScpMessages", [
+xdr.struct("LedgerRcaMessages", [
   ["ledgerSeq", xdr.lookup("Uint32")],
-  ["messages", xdr.varArray(xdr.lookup("ScpEnvelope"), 2147483647)],
+  ["messages", xdr.varArray(xdr.lookup("RcaEnvelope"), 2147483647)],
 ]);
 
 // === xdr source ============================================================
 //
-//   struct SCPHistoryEntryV0
+//   struct RCAHistoryEntryV0
 //   {
-//       SCPQuorumSet quorumSets<>; // additional quorum sets used by ledgerMessages
-//       LedgerSCPMessages ledgerMessages;
+//       RCAQuorumSet quorumSets<>; // additional quorum sets used by ledgerMessages
+//       LedgerRCAMessages ledgerMessages;
 //   };
 //
 // ===========================================================================
-xdr.struct("ScpHistoryEntryV0", [
-  ["quorumSets", xdr.varArray(xdr.lookup("ScpQuorumSet"), 2147483647)],
-  ["ledgerMessages", xdr.lookup("LedgerScpMessages")],
+xdr.struct("RcaHistoryEntryV0", [
+  ["quorumSets", xdr.varArray(xdr.lookup("RcaQuorumSet"), 2147483647)],
+  ["ledgerMessages", xdr.lookup("LedgerRcaMessages")],
 ]);
 
 // === xdr source ============================================================
 //
-//   union SCPHistoryEntry switch (int v)
+//   union RCAHistoryEntry switch (int v)
 //   {
 //   case 0:
-//       SCPHistoryEntryV0 v0;
+//       RCAHistoryEntryV0 v0;
 //   };
 //
 // ===========================================================================
-xdr.union("ScpHistoryEntry", {
+xdr.union("RcaHistoryEntry", {
   switchOn: xdr.int(),
   switchName: "v",
   switches: [
     [0, "v0"],
   ],
   arms: {
-    v0: xdr.lookup("ScpHistoryEntryV0"),
+    v0: xdr.lookup("RcaHistoryEntryV0"),
   },
 });
 
@@ -1601,10 +1601,10 @@ xdr.struct("PeerAddress", [
 //       TRANSACTION = 8, // pass on a tx you have heard about
 //   
 //       // RCA
-//       GET_SCP_QUORUMSET = 9,
-//       SCP_QUORUMSET = 10,
-//       SCP_MESSAGE = 11,
-//       GET_SCP_STATE = 12,
+//       GET_RCA_QUORUMSET = 9,
+//       RCA_QUORUMSET = 10,
+//       RCA_MESSAGE = 11,
+//       GET_RCA_STATE = 12,
 //   
 //       // new messages
 //       HELLO = 13
@@ -1620,10 +1620,10 @@ xdr.enum("MessageType", {
   getTxSet: 6,
   txSet: 7,
   transaction: 8,
-  getScpQuorumset: 9,
-  scpQuorumset: 10,
-  scpMessage: 11,
-  getScpState: 12,
+  getRcaQuorumset: 9,
+  rcaQuorumset: 10,
+  rcaMessage: 11,
+  getRcaState: 12,
   hello: 13,
 });
 
@@ -1643,7 +1643,7 @@ xdr.struct("DontHave", [
 
 // === xdr source ============================================================
 //
-//   union StellarMessage switch (MessageType type)
+//   union RoverMessage switch (MessageType type)
 //   {
 //   case ERROR_MSG:
 //       Error error;
@@ -1667,18 +1667,18 @@ xdr.struct("DontHave", [
 //       TransactionEnvelope transaction;
 //   
 //   // RCA
-//   case GET_SCP_QUORUMSET:
+//   case GET_RCA_QUORUMSET:
 //       uint256 qSetHash;
-//   case SCP_QUORUMSET:
-//       SCPQuorumSet qSet;
-//   case SCP_MESSAGE:
-//       SCPEnvelope envelope;
-//   case GET_SCP_STATE:
-//       uint32 getSCPLedgerSeq; // ledger seq requested ; if 0, requests the latest
+//   case RCA_QUORUMSET:
+//       RCAQuorumSet qSet;
+//   case RCA_MESSAGE:
+//       RCAEnvelope envelope;
+//   case GET_RCA_STATE:
+//       uint32 getRCALedgerSeq; // ledger seq requested ; if 0, requests the latest
 //   };
 //
 // ===========================================================================
-xdr.union("StellarMessage", {
+xdr.union("RoverMessage", {
   switchOn: xdr.lookup("MessageType"),
   switchName: "type",
   switches: [
@@ -1691,10 +1691,10 @@ xdr.union("StellarMessage", {
     ["getTxSet", "txSetHash"],
     ["txSet", "txSet"],
     ["transaction", "transaction"],
-    ["getScpQuorumset", "qSetHash"],
-    ["scpQuorumset", "qSet"],
-    ["scpMessage", "envelope"],
-    ["getScpState", "getScpLedgerSeq"],
+    ["getRcaQuorumset", "qSetHash"],
+    ["rcaQuorumset", "qSet"],
+    ["rcaMessage", "envelope"],
+    ["getRcaState", "getRcaLedgerSeq"],
   ],
   arms: {
     error: xdr.lookup("Error"),
@@ -1706,9 +1706,9 @@ xdr.union("StellarMessage", {
     txSet: xdr.lookup("TransactionSet"),
     transaction: xdr.lookup("TransactionEnvelope"),
     qSetHash: xdr.lookup("Uint256"),
-    qSet: xdr.lookup("ScpQuorumSet"),
-    envelope: xdr.lookup("ScpEnvelope"),
-    getScpLedgerSeq: xdr.lookup("Uint32"),
+    qSet: xdr.lookup("RcaQuorumSet"),
+    envelope: xdr.lookup("RcaEnvelope"),
+    getRcaLedgerSeq: xdr.lookup("Uint32"),
   },
 });
 
@@ -1717,14 +1717,14 @@ xdr.union("StellarMessage", {
 //   struct
 //   {
 //      uint64 sequence;
-//      StellarMessage message;
+//      RoverMessage message;
 //      HmacSha256Mac mac;
 //       }
 //
 // ===========================================================================
 xdr.struct("AuthenticatedMessageV0", [
   ["sequence", xdr.lookup("Uint64")],
-  ["message", xdr.lookup("StellarMessage")],
+  ["message", xdr.lookup("RoverMessage")],
   ["mac", xdr.lookup("HmacSha256Mac")],
 ]);
 
@@ -1736,7 +1736,7 @@ xdr.struct("AuthenticatedMessageV0", [
 //       struct
 //   {
 //      uint64 sequence;
-//      StellarMessage message;
+//      RoverMessage message;
 //      HmacSha256Mac mac;
 //       } v0;
 //   };
